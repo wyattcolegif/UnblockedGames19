@@ -1,0 +1,84 @@
+/unblocked-games-site
+├── index.html
+├── style.css
+├── js/
+│   └── script.js
+├── games/
+│   └── flappybird.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unblocked Games</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Unblocked Games Hub</h1>
+  </header>
+
+  <main>
+    <div class="game-list">
+      <a href="games/flappybird.html" class="game-link">Flappy Bird</a>
+      <!-- Add more games here -->
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 YourName | For educational use only</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #222;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+header {
+  background-color: #111;
+  padding: 1em 0;
+}
+
+.game-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2em;
+}
+
+.game-link {
+  background-color: #333;
+  color: white;
+  padding: 1em;
+  margin: 1em auto;
+  width: 200px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.game-link:hover {
+  background-color: #555;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flappy Bird</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    iframe { width: 100vw; height: 100vh; border: none; }
+  </style>
+</head>
+<body>
+  <iframe src="https://example.com/flappybird"></iframe>
+</body>
+</html>
