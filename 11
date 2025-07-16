@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Bird Clone</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #70c5ce;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      margin: auto;
+      background-color: #fff;
+      border: 2px solid #000;
+    }
+  </style>
+</head>
+<body>
+<canvas id="game" width="320" height="480"></canvas>
+
+<script>
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  let frames = 0;
+  const DEGREE = Math.PI / 180;
+
+  // Load sprite
+  const sprite = new Image();
+  sprite.src = "https://i.imgur.com/3v2oH1I.png"; // Base64 sprite image is too large to embed here
+
+  const state = {
+    current: 0,
+    getReady: 0,
+    game: 1,
+    over: 2
+  };
+
+  canvas.addEventListener("click", function () {
+    switch (state.current) {
+      case state.getReady:
+        state.current = state.game;
+        break;
+      case state.game:
+        bird.flap();
+        break;
+      case state.over:
+        pipes.reset();
+        bird.reset();
+        score.reset();
+        state.current = state.getReady;
+        break;
+    }
+  });
+
+  const bird = {
+    x: 50,
+    y: 150,
+    w: 34,
+    h: 26,
+
+    radius: 12,
+
+    frame: 0,
+    gravity: 0.25,
+    jump: 4.6,
+    speed: 0,
+    rotation: 0,
+
+    draw: function () {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.fillStyle = "yellow";
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    },
+
+    flap: function () {
+      this.speed = -this.jump;
+    },
+
+    update: function () {
+      if (state.current === state.getReady) {
+        this.y = 150;
+        this.rotation = 0;
+      } else {
+        this.speed += this.gravity;
+        this.y += this.speed;
+
+        if (this.speed >= this.jump) {
+          this.rotation = 90 * DEGREE;
+        } else {
+          this.rotation = -25 * DEGREE;
+        }
+
+        // Game over condition
+        if (this.y + this.h / 2 >= canvas.height) {
+          state.current = state.over;
+        }
+      }
+    },
+
+    reset: function () {
+      this.speed = 0;
+      this.y = 150;
+    }
+  };
+
+  const pipes = {
+    position: [],
+    w: 50,
+    h: 200,
+    gap: 85,
+    dx: 2,
+
+    draw: function () {
+      ctx.fillStyle = "#228B22";
+      this.position.forEach(pos => {
+        let topY = pos.y;
+        let bottomY = pos.y + this.h + this.gap;
+        ctx.fillRect(pos.x, topY, this.w, this.h);
+        ctx.fillRect(pos.x, bottomY, this.w, this.h);
+      });
+    },
+
+    update: function () {
+      if (state.current !== state.game) return;
+
+      if (frames % 100 === 0) {
+        this.position.push({
+          x: canvas.width,
+          y: -Math.floor(Math.random() * 100 + 50)
+        });
+      }
+
+      this.position.forEach((pos, i) => {
+        pos.x -= this.dx;
+
+        // Collision detection
+        let bx = bird.x;
+        let by = bird.y;
+        let br = bird.radius;
+
+        if (
+          bx + br > pos.x && bx - br < pos.x + this.w &&
+          (by - br < pos.y + this.h || by + br > pos.y + this.h + this.gap)
+        ) {
+          state.current = state.over;
+        }
+
+        // Remove off-screen pipes
+        if (pos.x + this.w < 0) {
+          this.position.shift();
+          score.value++;
+        }
+      });
+    },
+
+    reset: function () {
+      this.position = [];
+    }
+  };
+
+  const score = {
+    value: 0,
+
+    draw: function () {
+      ctx.fillStyle = "#000";
+      ctx.font = "20px Arial";
+      ctx.fillText(`Score: ${this.value}`, 10, 25);
+    },
+
+    reset: function () {
+      this.value = 0;
+    }
+  };
+
+  function draw() {
+    ctx.fillStyle = "#70c5ce";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    pipes.draw();
+    bird.draw();
+    score.draw();
+
+    if (state.current === state.getReady) {
+      ctx.fillStyle = "#000";
+      ctx.font = "24px Arial";
+      ctx.fillText("Click to Start", 90, canvas.height / 2);
+    }
+
+    if (state.current === state.over) {
+      ctx.fillStyle = "#f00";
+      ctx.font = "24px Arial";
+      ctx.fillText("Game Over", 100, canvas.height / 2);
+    }
+  }
+
+  function update() {
+    bird.update();
+    pipes.update();
+  }
+
+  function loop() {
+    update();
+    draw();
+    frames++;
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+</script>
+</body>
+</html>
